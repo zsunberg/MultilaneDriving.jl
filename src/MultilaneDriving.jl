@@ -4,6 +4,7 @@ using StaticArrays
 using Distributions
 using Parameters
 using AutomotiveDrivingModels
+using Base.Test
 
 importall POMDPs
 
@@ -16,6 +17,7 @@ export
     HighwayDrivingContext,
     Highway,
     AccelSpeed,
+    LongAccel,
 
     MLDPOMDP,
     MLDState,
@@ -26,6 +28,7 @@ export
 
 # package code goes here
 include("cached.jl")
+include("copula.jl")
 
 include("roadway.jl")
 

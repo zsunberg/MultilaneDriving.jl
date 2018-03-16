@@ -1,7 +1,7 @@
 struct MaxSafeAccel
     dt::Float64
 end
-        
+
 """
 Calculate the maximum safe acceleration that will allow the car to avoid a collision if the car in front slams on its brakes
 """
@@ -16,7 +16,7 @@ function max_safe_acc(safety::MaxSafeAccel, c::Context, idx::Int)
                                             vel(state(c, idx)),
                                             vel(state(c, fidx)),
                                             brake_limit(vehicle(c, idx)), dt)
-        return get(n_brake_acc, -mdp.dmodel.phys_param.brake_limit)
+        return get(n_brake_acc, -brake_limit(vehicle(c, idx)))
     end
 end
 
@@ -37,4 +37,18 @@ function nullable_max_safe_acc(gap, v_behind, v_ahead, braking_limit, dt)
     end
 end
 
+function is_safe(safety::MaxSafeAccel, c::Context, idx::Int, a::AccelSpeed)
+    return a.long_accel <= max_safe_acc(safety, c, idx)
+end
 
+struct RoadEdges
+    dt::Float64
+end
+
+function is_safe(safety::RoadEdges, c::Context, idx::Int, a::AccelSpeed)
+    y = pos(state(c, idx))[2]
+    w = width(vehicle(c, idx))
+    rw = c.roadway
+    next_y = y + a.lat_speed*safety.dt
+    return next_y - w/2 >= -rw.lanewidth/2 && next_y + w/2 <= (rw.n_lanes-0.5)*rw.lanewidth
+end
